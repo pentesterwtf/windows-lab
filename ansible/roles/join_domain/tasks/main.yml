@@ -1,0 +1,12 @@
+---
+- name: Join Domain
+  win_domain_membership:
+    dns_domain_name: "{{ ad_domain_name }}"
+    domain_admin_user: "{{ domain_admin }}@{{ ad_domain_name }}"
+    domain_admin_password: "{{ domain_admin_password }}"
+    state: domain
+  register: ds
+
+- name: Reboot (required after domain join)
+  win_reboot:
+  when: ds.reboot_required

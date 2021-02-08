@@ -1,0 +1,26 @@
+---
+
+- name: Enable Windows Scriptblock Logging
+  ignore_errors: yes
+  win_regedit:
+    key: "HKLM:\\Software\\Policies\\Microsoft\\Windows\\PowerShell\\ScriptBlockLogging"
+    value: EnableScriptBlockLogging
+    datatype: dword
+    data: 1
+
+- name: Enable Windows Scriptblock Logging
+  ignore_errors: yes
+  win_regedit:
+    key: "HKLM:\\Software\\Policies\\Microsoft\\Windows\\PowerShell\\ScriptBlockLogging"
+    value: EnableScriptBlockInvocationLogging
+    datatype: dword
+    data: 1
+
+- name: Disable Domain firewall
+  community.windows.win_firewall:
+    state: disabled
+    profiles:
+    - Domain
+
+- name: restart machine
+  win_reboot:

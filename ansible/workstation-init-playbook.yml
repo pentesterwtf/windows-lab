@@ -1,0 +1,41 @@
+---
+
+- name: workstation
+  hosts: all
+  gather_facts: False
+
+  vars:
+    ansible_user: vagrant
+    ansible_password: vagrant
+    ansible_connection: winrm
+    ansible_winrm_server_cert_validation: ignore
+    # FQDN of AD forrest
+    ad_domain_name: megabank.local
+    # Domain Admin credentials to set
+    domain_admin: vagrant
+    domain_admin_password: vagrant
+    hostname: CHANGEME
+
+  tasks:
+    - name: Wait for machine to boot
+      wait_for_connection:
+        timeout: 900
+    # We're on KVM - we want this box to know the local (hardware) clock is UTC
+    - name: Set clock to use UTC
+      win_command: bcdedit /set useplatformclock true
+    - name: Change the hostname to "{{ hostname }}"
+      win_hostname:
+        name: "{{ hostname }}"
+      register: res
+
+    - name: Reboot
+      win_reboot:
+      when: res.reboot_required
+
+    - name: join server to domain
+      import_role:
+        name: join_domain
+
+    - name: Windows generic role
+      import_role:
+        name: windows_common
